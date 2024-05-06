@@ -63,14 +63,14 @@ class OdometryCalculator:
         return (self.robot.encoder_values * self.robot.conversion_factor)
 
     # Devuelve el error en la posición y orientación del robot, restando la posición real (calculada con encoders) con los valores esperados 
-    def get_error(self) -> tuple[int, int]:
-        odometry = calculate_odometry()
-        encoder_dist = (odometry[0][1] + odometry[0][0]) / 2
-        encoder_theta = (odometry[0][1] - odometry[0][0]) / self.robot.between_wheels_dist
-        real_x = encoder_dist * math.cos(self.robot.theta + encoder_theta)
-        real_y = encoder_dist * math.sin(self.robot.theta + encoder_theta)
+#    def get_error(self) -> tuple[int, int]:
+#        odometry = calculate_odometry()
+#        encoder_dist = (odometry[0][1] + odometry[0][0]) / 2
+#        encoder_theta = (odometry[0][1] - odometry[0][0]) / self.robot.between_wheels_dist
+#        real_x = encoder_dist * math.cos(self.robot.theta + encoder_theta)
+#        real_y = encoder_dist * math.sin(self.robot.theta + encoder_theta)
 
-        return math.abs((self.robot.x - real_x, self.robot.y - real_y))
+#        return math.abs((self.robot.x - real_x, self.robot.y - real_y))
 
 # Ejemplo de uso
 robot = Robot()
