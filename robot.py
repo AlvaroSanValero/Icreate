@@ -5,11 +5,8 @@ import math
 class Robot:
     # wheel_radius=??, reduction=??, encoder_res=??, between_wheels_dist=??
     def __init__(self, port="/dev/ttyUSB0", speed=100, wheel_radius=1, reduction=1, encoder_res=1, between_wheels_dist=1):
-        if not hasattr(Robot, initPos):
-            Robot.initPos = (0, 0)
-
-        if not hasattr(Robot, initOrientation):
-            Robot.initOrientation = 0.
+        Robot.initPos = (0, 0)
+        Robot.initOrientation = 0.
 
         # Iniciar robot en modo `Safe`
         self.robot = Create2(port)
@@ -33,6 +30,7 @@ class Robot:
         self.robot.drive_direct(self.speed, self.speed)
         time.sleep(distance / self.speed)
         self.robot.drive_stop()
+
         self.x += distance * math.cos(math.radians(self.theta))
         self.y += distance * math.sin(math.radians(self.theta))
 
@@ -40,6 +38,7 @@ class Robot:
 
     def rotate(self, angle):
         # Rotación del robot en base a un ángulo dado y actualización de la orientación
+        self.robot.drive_direct()
         time.sleep(abs(angle) / (90 * (self.speed / 100)))  # Calcula el tiempo de espera dinámicamente
         self.robot.drive_stop()
         self.theta += angle
