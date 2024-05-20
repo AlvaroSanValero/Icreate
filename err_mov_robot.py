@@ -7,8 +7,8 @@ class Robot:
     def __init__(self, port="/dev/ttyUSB0", speed=500, wheel_radius=36, reduction=508.8, encoder_res=1, between_wheels_dist=235):
         Robot.initPos = (0, 0)
         Robot.initOrientation = 0.
-        Robot.errorThres = 0.01
-        Robot.correctionFactor = 4
+        Robot.errorThres = 2
+        Robot.correctionFactor = 2
 
         # Iniciar robot en modo `Safe`
         self.robot = Create2(port)
@@ -36,30 +36,45 @@ class Robot:
     def rec_move(self, distance, speed, corrections):
         print(f"Iteración de movimiento n. {corrections}\nDistancia: {distance}\nVelocidad: {speed}")
         current_distance = 0
-        self.robot.drive_direct(self.speed, self.speed)
-        while current_distance <= distance:
+        self.robot.drive_direct(speed, speed)
+        while abs(current_distance) <= distance:
                 prev_encoder = self.encoder_values
+                print(prev_encoder)
                 self.__update_all_sensors()
                 encoder_dif = (self.encoder_values[0] - prev_encoder[0], self.encoder_values[1] - prev_encoder[1])
                 current_distance += self.conversion_factor * encoder_dif[0]
+                if speed < 0:
+                    print(f"la diferencia de encoders es: {encoder_dif[0]}")
         self.robot.drive_stop()
 
 	    
-        error = current_distance - distance
+        error = abs(current_distance) - distance
         print(f"El error de movimiento es: {error}")
-        if abs(error) > Robot.errorThres and corrections - 1 < 20 and abs(speed) - Robot.correctionFactor * corrections > 0:
-            self.rec_move(error, (-1 if speed > 0 else 1) * (abs(speed) - Robot.correctionFactor * corrections), corrections + 1)
+        if error > Robot.errorThres and corrections - 1 < 20 and abs(speed) // Robot.correctionFactor > 20:
+            self.rec_move(error, int((-1 if speed > 0 else 1) * (abs(speed) // Robot.correctionFactor)), corrections + 1)
 
     def move(self, distance):
-        self.rec_move(distance, self.speed, 0)
+        self.rec_move(distance * (-1 if distance < 0 else 1), self.speed * (-1 if distance < 0 else 1), 0)
+
+    def palante(self):
+        self.robot.drive_direct(self.speed, self.speed)
+        time.sleep(1)
+        self.robot.drive_stop()
+
+    def patras(self):
+        self.robot.drive_direct(-self.speed, -self.speed)
+        time.sleep(1)
+        self.robot.drive_stop()
 
 
     def rotate(self, angle):
+        print("rotar")
         current_rotation = 0;
         self.robot.drive_direct(self.speed, -self.speed)
         angle = angle * math.pi / 180.
         while current_rotation < angle:
                 prev_encoder = self.encoder_values
+                print(prev_encoder)
                 self.__update_all_sensors()
                 encoder_dif = (self.encoder_values[0] - prev_encoder[0], self.encoder_values[1] - prev_encoder[1])
                 current_rotation -= 2 * encoder_dif[0] * self.conversion_factor / self.between_wheels_dist
@@ -102,10 +117,16 @@ robot = Robot()
 odometry_calculator = OdometryCalculator(robot)
 
 # Movimiento del robot y actualización de las distancias de los sensores
-robot.move(500)  # Por ejemplo, mueve 500 mm hacia adelante
-robot.rotate(90)  # Por ejemplo, rota 90 grados a la izquierda
+for _ in range(4):
+    robot.move(500)   # Por ejemplo, mueve 500 mm hacia adelante
+    robot.move(-500)   # Por ejemplo, mueve 500 mm hacia adelante
+    # robot.rotate(90)  # Por ejemplo, rota 90 grados a la izquierda
 # robot.update_distance_sensors([8, 12, 9])  # Supongamos que los sensores detectan estas distancias
+
+# robot.palante()
+# robot.patras()
+
+# robot.move_backwards()
 
 # Cálculo de la odometría después de cada movimiento
 # odometry_calculator.calculate_odometry()
-
