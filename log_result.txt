@@ -1,0 +1,32 @@
+Iteración de movimiento n. 0
+Distancia: 200
+Velocidad: 250
+Iteración de movimiento n. 1
+Distancia: 5.833594143218079
+Velocidad: -125
+Iteración de movimiento n. 2
+Distancia: 15.950090766107373
+Velocidad: 62
+Resultados del movimiento: (200.0, 0.0, 0.0)
+Resultados del giro: (200.0, 0.0, 1.5714269154447544)
+Iteración de movimiento n. 0
+Distancia: 200
+Velocidad: 250
+Resultados del movimiento: (199.87388227838673, 199.99996023579678, 1.5714269154447544)
+Resultados del giro: (199.87388227838673, 199.99996023579678, 3.1428538308895084)
+Iteración de movimiento n. 0
+Distancia: 200
+Velocidad: 250
+Iteración de movimiento n. 1
+Distancia: 4.944464146919103
+Velocidad: -125
+Iteración de movimiento n. 2
+Distancia: 16.83922076240635
+Velocidad: 62
+Resultados del movimiento: (-0.1259586648162383, 199.74772484272, 3.1428538308895084)
+Resultados del giro: (-0.1259586648162383, 199.74772484272, 4.714280746334262)
+Iteración de movimiento n. 0
+Distancia: 200
+Velocidad: 250
+Resultados del movimiento: (0.2523942994246096, -0.25191727954592125, 4.714280746334262)
+Resultados del giro: (0.2523942994246096, -0.25191727954592125, 6.285707661779016)

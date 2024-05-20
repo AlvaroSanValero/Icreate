@@ -1,0 +1,8 @@
+El error de movimiento es: 5.833594143218079
+El error de movimiento es: 15.950090766107373
+El error de movimiento es: 0.054249167274587506
+El error de movimiento es: 0.05424916727460527
+El error de movimiento es: 4.944464146919103
+El error de movimiento es: 16.83922076240635
+El error de movimiento es: 0.94337916357361
+El error de movimiento es: 0.94337916357361
