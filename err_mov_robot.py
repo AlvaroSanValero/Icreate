@@ -4,7 +4,7 @@ import math
 
 class Robot:
     # wheel_radius=??, reduction=??, encoder_res=??, between_wheels_dist=??
-    def __init__(self, port="/dev/tty.usbserial-DN04H0E4", speed=500, wheel_radius=36, reduction=508.8, encoder_res=1, between_wheels_dist=235):
+    def __init__(self, port="/dev/ttyUSB0", speed=500, wheel_radius=36, reduction=508.8, encoder_res=1, between_wheels_dist=235):
         Robot.initPos = (0, 0)
         Robot.initOrientation = 0.
         Robot.errorThres = 2
@@ -62,6 +62,9 @@ class Robot:
 
     def move(self, distance):
         self.rec_move(distance * (-1 if distance < 0 else 1), self.speed * (-1 if distance < 0 else 1) // 2, 0)
+        self.x += distance * math.cos(self.theta)
+        self.y += distance * math.sin(self.theta)
+        self.log_result(f"Resultados del movimiento: {self.x, self.y, self.theta}")
 
     def palante(self):
         self.robot.drive_direct(self.speed, self.speed)
@@ -135,7 +138,8 @@ class Robot:
                 #self.log("[INFO] Current rotation: " + str(current_rotation))
                 
                 error = angle - current_rotation
-                
+        self.theta += (angle + error)
+        self.log_result(f"Resultados del giro: {self.x, self.y, self.theta}")
         self.robot.drive_stop()
 
     def update_distance_sensors(self, distances):
