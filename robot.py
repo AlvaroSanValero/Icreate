@@ -7,7 +7,7 @@ class Robot:
     def __init__(self, port="/dev/tty.usbserial-DN04H0E4", speed=500, wheel_radius=36, reduction=508.8, encoder_res=1, between_wheels_dist=235):
         Robot.initPos = (0, 0)
         Robot.initOrientation = 0
-        Robot.errorRotate90 = 0.0008
+        Robot.errorRotate90 = 0.002
 
         # Iniciar robot en modo `Safe`
         self.robot = Create2(port)
@@ -57,7 +57,10 @@ class Robot:
     def rotate(self, angle):
         speedRotation = int(self.speed) // 4
         #error inversamente proporcional al valor del angulo de movimiento
-        errorRotation = angle * self.errorRotate90 / 90
+        if (abs(angle) >= 90):
+            errorRotation = abs(angle) * self.errorRotate90 / 90
+        else:
+            errorRotation = self.errorRotate90
         print(errorRotation)
         counter = 0
         speedLim = 20
@@ -158,19 +161,25 @@ odometry_calculator = OdometryCalculator(robot)
 # Movimiento del robot y actualización de las distancias de los sensores
 #robot.move(500)  # Por ejemplo, mueve 500 mm hacia adelante
 log_file = "robot_log_new.txt"
-robot.rotate(90)  # Por ejemplo, rota 90 grados a la izquierda
+robot.rotate(-90)  # Por ejemplo, rota 90 grados a la izquierda
 
 print("Termina")
 time.sleep(2)
 print("Continua")
 
-robot.rotate(180)
+robot.rotate(-180)
 
 print("Termina")
 time.sleep(2)
 print("Continua")
 
-robot.rotate(360)
+robot.rotate(-360)
+
+print("Termina")
+time.sleep(2)
+print("Continua")
+
+robot.rotate(-45)
 
 # robot.update_distance_sensors([8, 12, 9])  # Supongamos que los sensores detectan estas distancias
 
