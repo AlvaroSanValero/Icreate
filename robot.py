@@ -4,10 +4,10 @@ import math
 
 class Robot:
     # wheel_radius=??, reduction=??, encoder_res=??, between_wheels_dist=??
-    def __init__(self, port="/dev/tty.usbserial-DN04GLBY", speed=500, wheel_radius=36, reduction=508.8, encoder_res=1, between_wheels_dist=235):
+    def __init__(self, port="/dev/tty.usbserial-DN04H0E4", speed=500, wheel_radius=36, reduction=508.8, encoder_res=1, between_wheels_dist=235):
         Robot.initPos = (0, 0)
         Robot.initOrientation = 0
-        Robot.errorThres = 0.0001
+        Robot.errorRotate90 = 0.0008
 
         # Iniciar robot en modo `Safe`
         self.robot = Create2(port)
@@ -51,13 +51,18 @@ class Robot:
         # self.y += distance * math.sin(math.radians(self.theta))
 
     def log(self, message):
-        with open("robot_log7.txt", 'a') as file:
+        with open("robot_log_new.txt", 'a') as file:
             file.write(message + '\n')
 
     def rotate(self, angle):
+        speedRotation = int(self.speed) // 4
+        #error inversamente proporcional al valor del angulo de movimiento
+        errorRotation = angle * self.errorRotate90 / 90
+        print(errorRotation)
         counter = 0
+        speedLim = 20
         # Multiplicador del counter para reducir velocidad
-        counterLim = 100
+        counterLim = 25
         current_rotation = 0
         angle = angle * math.pi / 180.
         self.log("[INFO] Target angle: " + str(angle))
@@ -65,41 +70,44 @@ class Robot:
         flag = True
         error = angle
         # girar al sentido agujas del reloj
-        self.robot.drive_direct(self.speed, -self.speed)
+        self.robot.drive_direct(speedRotation, -speedRotation)
         # comparamos el error hasta que sea menor que nuestro threshold
         
-        while abs(error) >= self.errorThres:
+        while abs(error) >= errorRotation:
                 #
                 # comparamos hacia que lado tiene que girar en funcion de su error
                 #
                 # tiene que girar al contrario agujas del reloj
-                if error > 0:
-                    # si anteriormente su error era negativo
-                    if not flag:
-                        counter += 1
-                        flag = True
-                        self.robot.drive_stop()
-                        self.robot.drive_direct(self.speed, -self.speed)
+                if error > 0 and not flag:
+                    counter += 1
+                    flag = True
+                    self.robot.drive_stop()
+                    self.robot.drive_direct(speedRotation, -speedRotation)
 
-                        if self.speed > 20 + counterLim:
-                            self.speed = self.speed - (counterLim)
-                        else: 
-                            self.speed = 20
-                        self.log("[INFO] Speed adjusted (Clockwise): " + str(self.speed))
+                    if speedRotation > speedLim + counterLim:
+                        speedRotation = speedRotation - (counterLim)
+                    else: 
+                        speedRotation = speedLim
+                        time.sleep(0.2)
+
+                    
+                    self.log("[INFO] Speed adjusted (Clockwise): " + str(speedRotation))
+
                 # tiene que girar al sentido de agujas del reloj
-                elif error < 0:
-                    # si anteriormente su error era positivo
-                    if flag: 
-                        counter += 1                   
-                        flag = False
-                        self.robot.drive_stop()
-                        self.robot.drive_direct(-self.speed, self.speed)
-                        if self.speed > 20 + counterLim:
-                            self.speed = self.speed - (counterLim)
-                        else: 
-                            self.speed = 20
-                        self.log("[INFO] Speed adjusted (Counter-clockwise): " + str(self.speed))
-                
+                elif error < 0 and flag:
+                    counter += 1                   
+                    flag = False
+                    self.robot.drive_stop()
+                    self.robot.drive_direct(-speedRotation, speedRotation)
+
+                    if speedRotation > speedLim + counterLim:
+                        speedRotation = speedRotation - (counterLim)
+                    else: 
+                        speedRotation = speedLim
+                        time.sleep(0.2)
+
+                    self.log("[INFO] Speed adjusted (Counter-clockwise): " + str(speedRotation))
+            
                 prev_encoder = self.encoder_values
                 self.__update_all_sensors()
                 encoder_dif = (self.encoder_values[0] - prev_encoder[0], self.encoder_values[1] - prev_encoder[1])
@@ -107,7 +115,7 @@ class Robot:
                 #self.log("[INFO] Encoder values: " + str(self.encoder_values))
                 #self.log("[INFO] Current rotation: " + str(current_rotation))
                 
-                error = angle-current_rotation
+                error = angle - current_rotation
                 self.log("[INFO] Error: " + str(error))
         self.robot.drive_stop()
         self.log("[INFO] Rotation complete. Stopping robot.")
@@ -149,8 +157,21 @@ odometry_calculator = OdometryCalculator(robot)
 
 # Movimiento del robot y actualización de las distancias de los sensores
 #robot.move(500)  # Por ejemplo, mueve 500 mm hacia adelante
-log_file = "robot_log.txt"
+log_file = "robot_log_new.txt"
 robot.rotate(90)  # Por ejemplo, rota 90 grados a la izquierda
+
+print("Termina")
+time.sleep(2)
+print("Continua")
+
+robot.rotate(180)
+
+print("Termina")
+time.sleep(2)
+print("Continua")
+
+robot.rotate(360)
+
 # robot.update_distance_sensors([8, 12, 9])  # Supongamos que los sensores detectan estas distancias
 
 # Cálculo de la odometría después de cada movimiento
